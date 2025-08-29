@@ -1,0 +1,25 @@
+example_input: |
+  Masked Code:
+  
+    import os
+
+    class MyProcessor:
+
+        def __init__(self, config_path):
+            self.config = self._load_config(config_path)
+
+        def _load_config(self, path):
+            if os.path.MASK_0(path):
+                with open(path, 'r') as f:
+                    data = f.read()
+                return data
+            return None
+
+        def process(self, data):
+            if data:
+                processed_data = data.upper().strip()
+                return processed_data
+            return ''
+    processor = MyProcessor('my_config.txt')
+    result = processor.MASK_1('  some DATA  ')
+    print(result)

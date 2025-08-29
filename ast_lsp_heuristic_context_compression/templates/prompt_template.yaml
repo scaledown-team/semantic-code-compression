@@ -1,0 +1,26 @@
+name: Masked Code Completion
+
+description: >
+  You will be provided with code containing masked values represented as MASK_X, where X is a number.
+  Your task is to predict the exact replacement text for each masked value.
+  Respond with a JSON block within triple backticks (```json) containing a dictionary where the keys are the masked value identifiers (e.g., 'MASK_0', 'MASK_1') and the values are your predicted replacement texts.
+  If the JSON block is not formatted or closed properly or the JSON is not valid, you will FAIL the task.
+  Ensure your response contains only the JSON block and no additional text or explanation.
+
+example_output: |
+  ```json
+  {"MASK_0": "exists", "MASK_1": "process"}
+  ```
+
+prompt: |
+  Description:
+
+  {{ description }}
+
+  Example Input:
+
+  {{ example_input }}
+
+  Example Output:
+
+  {{ example_output }}
