@@ -1,40 +1,41 @@
 import os
-import ast
+from semantic_units import extract_semantic_units
+from sentence_transformers import SentenceTransformer
+import faiss
+import numpy as np
+from pathlib import Path
 
-def extract_semantic_units(file_path):
-    """Extract file, classes, and functions from a Python file."""
-    with open(file_path, "r", encoding="utf-8") as f:
-        source = f.read()
 
-    tree = ast.parse(source)
-    semantic_units = []
+model = SentenceTransformer("all-MiniLM-L6-v2")
 
-    # File as a whole
-    semantic_units.append({
-        "module": os.path.splitext(os.path.basename(file_path))[0],
-        "class": None,
-        "file_name": os.path.basename(file_path),
-        "semantic_unit": "file",
-        "code": source
-    })
+EXCLUDED_DIRS = {".venv", "__pycache__", ".git"}
 
-    for node in ast.walk(tree):
-        if isinstance(node, ast.ClassDef):
-            class_code = ast.get_source_segment(source, node)
-            semantic_units.append({
-                "module": os.path.splitext(os.path.basename(file_path))[0],
-                "class": node.name,
-                "file_name": os.path.basename(file_path),
-                "semantic_unit": "class",
-                "code": class_code
-            })
-        elif isinstance(node, ast.FunctionDef):
-            func_code = ast.get_source_segment(source, node)
-            semantic_units.append({
-                "module": os.path.splitext(os.path.basename(file_path))[0],
-                "class": None,
-                "file_name": os.path.basename(file_path),
-                "semantic_unit": "function",
-                "code": func_code
-            })
-    return semantic_units
+def iter_py_files(root: Path):
+    """Yield only .py files, skipping excluded directories like .venv and __pycache__."""
+    for path in root.rglob("*.py"):
+        if not any(part in EXCLUDED_DIRS for part in path.parts):
+            yield path
+
+
+def build_vector_db(directory: Path):
+    all_units = []
+    embeddings = []
+
+    for file_path in iter_py_files(directory):  # only safe .py files
+        semantic_units = extract_semantic_units(file_path)
+
+        for unit in semantic_units:
+            emb = model.encode(unit["code"])
+            unit["embedding"] = emb.tolist()
+            all_units.append(unit)
+            embeddings.append(emb)
+
+    if not embeddings:
+        raise ValueError("No Python files found to index!")
+
+    # Build FAISS index
+    d = len(embeddings[0])
+    index = faiss.IndexFlatL2(d)
+    index.add(np.array(embeddings, dtype=np.float32))
+
+    return index, all_units
