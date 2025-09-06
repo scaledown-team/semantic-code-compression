@@ -6,7 +6,7 @@ import numpy as np
 from pathlib import Path
 
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
+model = SentenceTransformer("Qwen/Qwen3-Embedding-0.6B")
 
 EXCLUDED_DIRS = {".venv", "__pycache__", ".git"}
 

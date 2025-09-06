@@ -1,2 +1,3 @@
 .venv
 uv.lovk
+__pycache__/
