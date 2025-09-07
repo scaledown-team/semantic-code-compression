@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 import yaml
 from jinja2 import Template
+from pathlib import Path
 
 class PromptTemplate(BaseModel):
     name: str
@@ -14,8 +15,8 @@ class PromptTemplate(BaseModel):
             example_output=self.example_output,
             **kwargs
         )
-    
-def get_prompt(prompt_path="templates/prompt_template.yaml", example_input_path="templates/example_input.yaml"):
+
+def get_prompt(prompt_path="ast_lsp_heuristic_context_compression/templates/prompt_template.yaml", example_input_path="ast_lsp_heuristic_context_compression/templates/example_input.yaml"):
     with open(prompt_path) as f:
         prompt_template = yaml.safe_load(f)
 
