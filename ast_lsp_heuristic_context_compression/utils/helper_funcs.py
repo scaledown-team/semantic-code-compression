@@ -56,7 +56,7 @@ def extract_json_from_response(response_text):
         print(f"An error occurred during JSON extraction or parsing: {e}")
         return None
 
-def call_scaledown(prompt, context, headers, model="gemini-2.5-flash") -> requests.Response:
+def call_scaledown(prompt, context, headers, string, model="gemini-2.5-flash") -> requests.Response:
     """
     Calls the scaledown API with a vanilla configuration (scaledown.rate = 0).
 
@@ -72,10 +72,15 @@ def call_scaledown(prompt, context, headers, model="gemini-2.5-flash") -> reques
     payload = json.dumps({
       "context": context,
       "prompt": prompt,
+      "code": string,
       "model": model,
       "scaledown": {
         "rate": 0
       }
     })
+
+    with open("payload.json", "w") as f:
+        f.write(payload)
+
     response = requests.request("POST", url, headers=headers, data=payload)
     return response
